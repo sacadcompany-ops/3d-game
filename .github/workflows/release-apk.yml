@@ -34,8 +34,10 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Accept Android SDK Licenses & Prepare Environment
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager --install "platforms;android-34" "build-tools;34.0.0" || true
 
       - name: Sync Web Assets to Android Platform
         run: npx cap sync android
@@ -46,7 +48,7 @@ jobs:
       - name: Build Android APK via Gradle
         run: |
           cd android
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Prepare Tagged APK
         run: |
@@ -56,7 +58,7 @@ jobs:
           if [ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
             cp android/app/build/outputs/apk/debug/app-debug.apk "${TARGET_APK}"
           else
-            find android/app/build/outputs/apk/ -name "*.apk" -exec cp {} "${TARGET_APK}" \;
+            find android/app/build/outputs/ -name "*.apk" -exec cp {} "${TARGET_APK}" \;
           fi
           echo "RELEASE_APK=${TARGET_APK}" >> $GITHUB_ENV
 
