@@ -1,23 +1,28 @@
-name: Build Android APK
+name: Build & Auto-Release Android APK
 
 on:
   push:
     branches:
       - main
       - master
+    tags:
+      - 'v*'
   pull_request:
     branches:
       - main
       - master
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
   group: 'android-build'
   cancel-in-progress: true
 
 jobs:
-  build-apk:
-    name: Build & Package Android APK
+  build-and-release-apk:
+    name: Build, Package & Auto-Release APK
     runs-on: ubuntu-latest
 
     steps:
@@ -58,17 +63,16 @@ jobs:
           cd android
           ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Prepare APK Output Directory
+      - name: Prepare APK File
         run: |
           mkdir -p build/android
-          # Copy generated APK to target name
           if [ -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
             cp android/app/build/outputs/apk/debug/app-debug.apk build/android/Somaliland-Driving-Simulator.apk
           else
             find android/app/build/outputs/ -name "*.apk" -exec cp {} build/android/Somaliland-Driving-Simulator.apk \;
           fi
 
-      - name: Verify APK Generation
+      - name: Verify APK Output
         run: |
           if [ ! -f "build/android/Somaliland-Driving-Simulator.apk" ]; then
             echo "Error: APK file was not created!"
@@ -76,9 +80,28 @@ jobs:
           fi
           echo "APK successfully built: $(ls -lh build/android/Somaliland-Driving-Simulator.apk)"
 
-      - name: Upload Somaliland Driving Simulator APK Artifact
+      - name: Upload APK to Actions Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Somaliland-Driving-Simulator-APK
           path: build/android/Somaliland-Driving-Simulator.apk
           retention-days: 30
+
+      - name: Automatically Publish / Update GitHub Release
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || 'v1.0.0' }}
+          name: ${{ github.ref_type == 'tag' && format('Somaliland Driving Simulator {0}', github.ref_name) || 'Somaliland Driving Simulator v1.0.0 (Latest Release)' }}
+          body: |
+            ## 🚗 Somaliland Driving Simulator - Official Android APK
+            
+            - **Application ID**: `com.somaliland.driving.simulator`
+            - **Version**: `1.0.0`
+            - **Platform**: Android ARM64 (`arm64-v8a`) / ARMv7
+            
+            ### 📲 Direct APK Download
+            Download **`Somaliland-Driving-Simulator.apk`** below to install directly on your Android mobile device!
+          files: build/android/Somaliland-Driving-Simulator.apk
+          draft: false
+          prerelease: false
