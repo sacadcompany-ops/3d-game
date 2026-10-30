@@ -1,0 +1,6 @@
+{
+  "name": "Urban Drive 3D: City Parking & Traffic Simulator",
+  "description": "High-fidelity 3D mobile driving and parking simulator with realistic vehicle handling, traffic AI, parking challenges, 360 garage, upgrades, and customizable cars.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

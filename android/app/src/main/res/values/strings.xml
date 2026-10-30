@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Somaliland Driving Simulator</string>
+    <string name="title_activity_main">Somaliland Driving Simulator</string>
+    <string name="package_name">com.somaliland.driving.simulator</string>
+    <string name="custom_url_scheme">com.somaliland.driving.simulator</string>
+</resources>

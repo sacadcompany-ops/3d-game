@@ -1,0 +1,29 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Android build outputs & Gradle cache
+android/.gradle/
+android/app/build/
+android/build/
+android/captures/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Unity / native cache ignores
+Library/
+Temp/
+Logs/
+Obj/
+Build/
+Builds/
+UserSettings/
+MemoryCaptures/
+
